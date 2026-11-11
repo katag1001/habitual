@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -7,7 +8,7 @@ import { Confetti, ConfettiBurst, createBurst } from '@/components/Confetti';
 import { DailyList } from '@/components/DailyList';
 import { HabitGrid } from '@/components/HabitGrid';
 import { LogAmountSheet, LogTarget } from '@/components/LogAmountSheet';
-import { TabSwitch } from '@/components/TabSwitch';
+import { Tab, TabSwitch } from '@/components/TabSwitch';
 import { PeriodKind, periodKey, periodLabel, shiftPeriod, today } from '@/lib/dates';
 import { Habit, periodPercent, streak } from '@/lib/habits';
 import { useHabits } from '@/store/HabitsContext';
@@ -19,9 +20,18 @@ const STREAK_UNIT: Record<PeriodKind, [string, string]> = {
   month: ['month', 'months'],
 };
 
+const PERIOD_TABS: Tab<PeriodKind>[] = [
+  { key: 'day', label: 'daily' },
+  { key: 'week', label: 'weekly' },
+  { key: 'month', label: 'monthly' },
+];
+
 export default function Home() {
   const insets = useSafeAreaInsets();
-  const { habits, logs, addHabit } = useHabits();
+  const { habits: allHabits, logs, addHabit } = useHabits();
+  const habits = useMemo(() => allHabits.filter((h) => !h.archived), [allHabits]);
+  const archived = useMemo(() => allHabits.filter((h) => h.archived), [allHabits]);
+  const [showArchived, setShowArchived] = useState(false);
   const [kind, setKind] = useState<PeriodKind>('week');
   const [anchor, setAnchor] = useState(today);
   const [adding, setAdding] = useState(false);
@@ -60,7 +70,7 @@ export default function Home() {
       </View>
 
       <View style={styles.tabs}>
-        <TabSwitch value={kind} onChange={setKind} />
+        <TabSwitch tabs={PERIOD_TABS} value={kind} onChange={setKind} />
       </View>
 
       <View style={styles.nav}>
@@ -87,6 +97,21 @@ export default function Home() {
           <DailyList date={anchor} habits={habits} logs={logs} onPressHabit={openLog} />
         ) : (
           <HabitGrid kind={kind} anchor={anchor} habits={habits} logs={logs} onPressCell={openLog} />
+        )}
+        {archived.length > 0 && (
+          <View style={styles.archived}>
+            <Pressable onPress={() => setShowArchived((v) => !v)} hitSlop={8}>
+              <Text style={styles.archivedToggle}>
+                {showArchived ? 'hide' : 'show'} archived ({archived.length})
+              </Text>
+            </Pressable>
+            {showArchived &&
+              archived.map((h) => (
+                <Pressable key={h.id} onPress={() => router.push(`/habit/${h.id}`)} hitSlop={4}>
+                  <Text style={styles.archivedName}>{h.name}</Text>
+                </Pressable>
+              ))}
+          </View>
         )}
       </ScrollView>
 
@@ -135,4 +160,7 @@ const styles = StyleSheet.create({
   arrowText: { fontFamily: fonts.bold, fontSize: 30, color: colors.red, lineHeight: 34 },
   navLabel: { fontFamily: fonts.bold, fontSize: 16, color: colors.text },
   empty: { fontFamily: fonts.body, fontSize: 16, color: colors.textSoft, textAlign: 'center', marginTop: 60 },
+  archived: { alignItems: 'center', gap: 10, marginTop: 32 },
+  archivedToggle: { fontFamily: fonts.bold, fontSize: 13, color: colors.textSoft, textDecorationLine: 'underline' },
+  archivedName: { fontFamily: fonts.bold, fontSize: 15, color: colors.textSoft },
 });

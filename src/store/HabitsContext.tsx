@@ -15,6 +15,7 @@ interface HabitsState {
   habits: Habit[];
   logs: Logs;
   addHabit: (h: Omit<Habit, 'id' | 'createdAt'>) => void;
+  updateHabit: (id: string, changes: Partial<Omit<Habit, 'id' | 'createdAt'>>) => void;
   deleteHabit: (id: string) => void;
   /** Sets the amount for a day. Returns true if this completed a day/week/month for the first time. */
   setLog: (habitId: string, date: Date, value: number) => boolean;
@@ -60,6 +61,10 @@ export function HabitsProvider({ children }: { children: ReactNode }) {
     setHabits((prev) => [...prev, { ...h, id, createdAt: dateKey(today()) }]);
   }, []);
 
+  const updateHabit = useCallback((id: string, changes: Partial<Omit<Habit, 'id' | 'createdAt'>>) => {
+    setHabits((prev) => prev.map((h) => (h.id === id ? { ...h, ...changes } : h)));
+  }, []);
+
   const deleteHabit = useCallback((id: string) => {
     setHabits((prev) => prev.filter((h) => h.id !== id));
     setLogs((prev) => {
@@ -77,10 +82,11 @@ export function HabitsProvider({ children }: { children: ReactNode }) {
       const next = { ...logs, [habitId]: forHabit };
       setLogs(next);
 
+      const active = habits.filter((h) => !h.archived);
       let celebrate = false;
       for (const kind of ['day', 'week', 'month'] as PeriodKind[]) {
         const pk = periodKey(kind, date);
-        if (!celebrated.current.has(pk) && periodPercent(habits, next, kind, date) === 100) {
+        if (!celebrated.current.has(pk) && periodPercent(active, next, kind, date) === 100) {
           celebrated.current.add(pk);
           celebrate = true;
         }
@@ -94,7 +100,7 @@ export function HabitsProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <HabitsContext.Provider value={{ ready, habits, logs, addHabit, deleteHabit, setLog }}>
+    <HabitsContext.Provider value={{ ready, habits, logs, addHabit, updateHabit, deleteHabit, setLog }}>
       {children}
     </HabitsContext.Provider>
   );

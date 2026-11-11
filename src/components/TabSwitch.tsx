@@ -2,33 +2,40 @@ import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
-import { PeriodKind } from '@/lib/dates';
 import { colors, fonts } from '@/theme';
 
-const TABS: { kind: PeriodKind; label: string }[] = [
-  { kind: 'day', label: 'daily' },
-  { kind: 'week', label: 'weekly' },
-  { kind: 'month', label: 'monthly' },
-];
+export interface Tab<T extends string> {
+  key: T;
+  label: string;
+}
 
-export function TabSwitch({ value, onChange }: { value: PeriodKind; onChange: (k: PeriodKind) => void }) {
+interface Props<T extends string> {
+  tabs: Tab<T>[];
+  value: T;
+  onChange: (k: T) => void;
+  small?: boolean;
+}
+
+export function TabSwitch<T extends string>({ tabs, value, onChange, small }: Props<T>) {
   const [width, setWidth] = useState(0);
-  const index = TABS.findIndex((t) => t.kind === value);
+  const index = tabs.findIndex((t) => t.key === value);
   const x = useSharedValue(index);
 
   useEffect(() => {
     x.value = withTiming(index, { duration: 220 });
   }, [index, x]);
 
-  const tabW = (width - 8) / TABS.length;
+  const tabW = (width - 8) / tabs.length;
   const pill = useAnimatedStyle(() => ({ transform: [{ translateX: x.value * tabW }] }));
 
   return (
-    <View style={styles.wrap} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
-      {width > 0 && <Animated.View style={[styles.pill, { width: tabW }, pill]} />}
-      {TABS.map((t) => (
-        <Pressable key={t.kind} style={styles.tab} onPress={() => onChange(t.kind)}>
-          <Text style={[styles.label, t.kind === value && { color: colors.card }]}>{t.label}</Text>
+    <View style={[styles.wrap, small && styles.wrapSmall]} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
+      {width > 0 && <Animated.View style={[styles.pill, small && styles.pillSmall, { width: tabW }, pill]} />}
+      {tabs.map((t) => (
+        <Pressable key={t.key} style={styles.tab} onPress={() => onChange(t.key)}>
+          <Text style={[styles.label, small && styles.labelSmall, t.key === value && { color: colors.card }]}>
+            {t.label}
+          </Text>
         </Pressable>
       ))}
     </View>
@@ -44,7 +51,10 @@ const styles = StyleSheet.create({
     padding: 3,
     height: 44,
   },
+  wrapSmall: { height: 34, borderRadius: 17 },
   pill: { position: 'absolute', top: 3, left: 3, bottom: 3, borderRadius: 18, backgroundColor: colors.red },
+  pillSmall: { borderRadius: 13 },
   tab: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   label: { fontFamily: fonts.bold, fontSize: 15, color: colors.red },
+  labelSmall: { fontSize: 13 },
 });

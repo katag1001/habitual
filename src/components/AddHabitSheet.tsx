@@ -21,22 +21,24 @@ interface Props {
   visible: boolean;
   onClose: () => void;
   onSave: (h: Omit<Habit, 'id' | 'createdAt'>) => void;
+  /** When set, the sheet edits this habit instead of creating a new one. */
+  initial?: Habit;
 }
 
-export function AddHabitSheet({ visible, onClose, onSave }: Props) {
+export function AddHabitSheet({ visible, onClose, onSave, initial }: Props) {
   return (
     <Sheet visible={visible} onClose={onClose}>
-      {visible && <AddHabitBody onClose={onClose} onSave={onSave} />}
+      {visible && <AddHabitBody onClose={onClose} onSave={onSave} initial={initial} />}
     </Sheet>
   );
 }
 
-function AddHabitBody({ onClose, onSave }: Omit<Props, 'visible'>) {
-  const [name, setName] = useState('');
-  const [rawAmount, setAmount] = useState(1);
-  const [unitIdx, setUnitIdx] = useState(2);
-  const [periodIdx, setPeriodIdx] = useState(0);
-  const [days, setDays] = useState<number[]>([]);
+function AddHabitBody({ onClose, onSave, initial }: Omit<Props, 'visible'>) {
+  const [name, setName] = useState(initial?.name ?? '');
+  const [rawAmount, setAmount] = useState(initial?.amount ?? 1);
+  const [unitIdx, setUnitIdx] = useState(initial ? UNITS.indexOf(initial.unit) : 2);
+  const [periodIdx, setPeriodIdx] = useState(initial ? PERIODS.indexOf(initial.period) : 0);
+  const [days, setDays] = useState<number[]>(initial?.days ?? []);
 
   const unit = UNITS[unitIdx];
   const period = PERIODS[periodIdx];

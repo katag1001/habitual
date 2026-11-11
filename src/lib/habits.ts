@@ -21,6 +21,8 @@ export interface Habit {
   days?: number[];
   /** YYYY-MM-DD */
   createdAt: string;
+  /** Hidden from the home screen; history is kept. */
+  archived?: boolean;
 }
 
 /** habitId -> YYYY-MM-DD -> amount logged that day (in the habit's unit) */
@@ -180,12 +182,9 @@ export function logMax(h: Habit): number {
   return Math.max(20, h.amount);
 }
 
-/** Starting value for the log popup: what's already logged, otherwise what's left to do. */
+/** Starting value for the log popup: what's already logged that day, otherwise the goal amount. */
 export function logDefault(h: Habit, logs: Logs, d: Date): number {
   const existing = valueOn(logs, h.id, d);
   if (existing > 0) return existing;
-  if (isPerDay(h)) return h.amount;
-  if (h.unit === 'times') return 1;
-  const { done, target } = ownPeriodProgress(h, logs, d);
-  return Math.min(logMax(h), Math.max(1, target - done));
+  return Math.min(logMax(h), h.amount);
 }
