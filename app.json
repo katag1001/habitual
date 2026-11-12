@@ -30,12 +30,23 @@
           "resizeMode": "contain",
           "backgroundColor": "#FBE3E1"
         }
-      ]
+      ],
+      "expo-status-bar"
     ],
     "scheme": "habitual",
     "experiments": {
       "typedRoutes": true
     },
-    "backgroundColor": "#FBE3E1"
+    "backgroundColor": "#FBE3E1",
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "8ec83969-fced-4064-9eb7-f870208c90db"
+      }
+    }
   }
 }
