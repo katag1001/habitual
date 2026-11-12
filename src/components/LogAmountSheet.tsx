@@ -6,7 +6,7 @@ import { WheelPicker } from './WheelPicker';
 import { dateKey, shortDate } from '@/lib/dates';
 import { Habit, describeHabit, logDefault, logMax, unitLabel } from '@/lib/habits';
 import { useHabits } from '@/store/HabitsContext';
-import { colors, fonts } from '@/theme';
+import { fonts, makeStyles } from '@/theme';
 
 export interface LogTarget {
   habit: Habit;
@@ -36,6 +36,7 @@ export function LogAmountSheet({ target, onClose, onCelebrate }: Props) {
 }
 
 function LogBody({ habit, date, onClose, onCelebrate }: LogTarget & Omit<Props, 'target'>) {
+  const styles = useStyles();
   const { logs, setLog } = useHabits();
   // The wheel only has whole numbers; converted logs (e.g. 1.5 hours) round to the nearest.
   const [value, setValue] = useState(() => Math.round(logDefault(habit, logs, date)));
@@ -64,9 +65,11 @@ function LogBody({ habit, date, onClose, onCelebrate }: LogTarget & Omit<Props, 
   );
 }
 
-const styles = StyleSheet.create({
-  title: { fontFamily: fonts.display, fontSize: 26, color: colors.red },
-  sub: { fontFamily: fonts.body, fontSize: 14, color: colors.textSoft, marginTop: 2, marginBottom: 12 },
-  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
-  unit: { fontFamily: fonts.bold, fontSize: 18, color: colors.red, width: 90 },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    title: { fontFamily: fonts.display, fontSize: 26, color: colors.red },
+    sub: { fontFamily: fonts.body, fontSize: 14, color: colors.textSoft, marginTop: 2, marginBottom: 12 },
+    row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+    unit: { fontFamily: fonts.bold, fontSize: 18, color: colors.red, width: 90 },
+  }),
+);

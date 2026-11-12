@@ -8,7 +8,8 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-const COLORS = ['#B8242C', '#E35D6A', '#F4A3A8', '#FFD27A', '#FFFFFF', '#8E1A21'];
+import { useColors } from '@/theme';
+
 const COUNT = 70;
 const DURATION = 2800;
 const GRAVITY = 2.6;
@@ -20,7 +21,8 @@ interface Piece {
   spin: number;
   w: number;
   h: number;
-  color: string;
+  /** 0–1, picks a colour from the current scheme's confetti list. */
+  hue: number;
 }
 
 export interface ConfettiBurst {
@@ -39,7 +41,7 @@ export function createBurst(): ConfettiBurst {
       spin: (Math.random() - 0.5) * 1440,
       w: 6 + Math.random() * 6,
       h: 10 + Math.random() * 8,
-      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      hue: Math.random(),
     })),
   };
 }
@@ -66,6 +68,8 @@ export function Confetti({ burst }: { burst: ConfettiBurst | null }) {
 
 function ConfettiPiece({ piece, t }: { piece: Piece; t: SharedValue<number> }) {
   const { width, height } = useWindowDimensions();
+  const palette = useColors().confetti;
+  const color = palette[Math.floor(piece.hue * palette.length)];
 
   const style = useAnimatedStyle(() => {
     const s = t.value;
@@ -84,7 +88,7 @@ function ConfettiPiece({ piece, t }: { piece: Piece; t: SharedValue<number> }) {
   return (
     <Animated.View
       style={[
-        { position: 'absolute', left: 0, top: 0, width: piece.w, height: piece.h, backgroundColor: piece.color, borderRadius: 2 },
+        { position: 'absolute', left: 0, top: 0, width: piece.w, height: piece.h, backgroundColor: color, borderRadius: 2 },
         style,
       ]}
     />

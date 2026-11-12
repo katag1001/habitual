@@ -5,7 +5,7 @@ import { Pressable, ScrollView, ScrollViewInstance, StyleSheet, Text, View, useW
 import { Dot } from './Dot';
 import { WEEKDAYS, dateKey, daysBetween, periodRange, today, weekdayIndex } from '@/lib/dates';
 import { Habit, Logs, cellState } from '@/lib/habits';
-import { colors, fonts } from '@/theme';
+import { fonts, makeStyles } from '@/theme';
 
 const NAME_W = 108;
 const ROW_H = 52;
@@ -22,6 +22,7 @@ interface Props {
 }
 
 export function HabitGrid({ kind, anchor, habits, logs, onPressCell }: Props) {
+  const styles = useStyles();
   const { width } = useWindowDimensions();
   const now = today();
   const todayKey = dateKey(now);
@@ -98,27 +99,38 @@ export function HabitGrid({ kind, anchor, habits, logs, onPressCell }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  grid: { flexDirection: 'row', paddingHorizontal: H_PAD },
-  nameCell: {
-    height: ROW_H,
-    justifyContent: 'center',
-    paddingRight: 8,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.pink,
-  },
-  name: { fontFamily: fonts.bold, fontSize: 14, color: colors.text, textDecorationLine: 'underline', textDecorationColor: colors.pink },
-  headCell: { height: HEADER_H - 6, width: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginBottom: 6 },
-  headToday: { backgroundColor: colors.red },
-  headDay: { fontFamily: fonts.bold, fontSize: 12, color: colors.red, textTransform: 'uppercase' },
-  headNum: { fontFamily: fonts.body, fontSize: 11, color: colors.textSoft },
-  headTextToday: { color: colors.card },
-  cell: {
-    height: ROW_H,
-    alignSelf: 'stretch',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.pink,
-  },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    grid: { flexDirection: 'row', paddingHorizontal: H_PAD },
+    nameCell: {
+      height: ROW_H,
+      justifyContent: 'center',
+      paddingRight: 8,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.pink,
+    },
+    // A bottom border instead of textDecoration, so the line can sit lower and be thicker.
+    name: {
+      alignSelf: 'flex-start',
+      fontFamily: fonts.bold,
+      fontSize: 14,
+      color: colors.text,
+      paddingBottom: 4,
+      borderBottomWidth: 2,
+      borderColor: colors.red,
+    },
+    headCell: { height: HEADER_H - 6, width: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginBottom: 6 },
+    headToday: { backgroundColor: colors.red },
+    headDay: { fontFamily: fonts.bold, fontSize: 12, color: colors.red, textTransform: 'uppercase' },
+    headNum: { fontFamily: fonts.body, fontSize: 11, color: colors.textSoft },
+    headTextToday: { color: colors.card },
+    cell: {
+      height: ROW_H,
+      alignSelf: 'stretch',
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.pink,
+    },
+  }),
+);

@@ -2,7 +2,7 @@ import { memo, useEffect } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
-import { colors } from '@/theme';
+import { makeStyles, useColors } from '@/theme';
 
 interface Props {
   size: number;
@@ -13,6 +13,8 @@ interface Props {
 }
 
 export const Dot = memo(function Dot({ size, planned, fill, disabled, onPress }: Props) {
+  const styles = useStyles();
+  const colors = useColors();
   const level = useSharedValue(fill);
 
   useEffect(() => {
@@ -41,7 +43,9 @@ export const Dot = memo(function Dot({ size, planned, fill, disabled, onPress }:
   );
 });
 
-const styles = StyleSheet.create({
-  dot: { borderWidth: 1.5, overflow: 'hidden', justifyContent: 'flex-end' },
-  fill: { width: '100%', backgroundColor: colors.red },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    dot: { borderWidth: 1.5, overflow: 'hidden', justifyContent: 'flex-end' },
+    fill: { width: '100%', backgroundColor: colors.red },
+  }),
+);

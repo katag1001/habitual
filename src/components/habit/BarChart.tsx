@@ -4,7 +4,7 @@ import Svg, { Line, Rect } from 'react-native-svg';
 
 import { Unit } from '@/lib/habits';
 import { Bar, formatAmount } from '@/lib/stats';
-import { colors, fonts } from '@/theme';
+import { fonts, makeStyles, useColors } from '@/theme';
 
 interface Props {
   bars: Bar[];
@@ -18,6 +18,8 @@ interface Props {
 
 /** Bars for each day/month; met goals are solid red, short ones pink. Tap a bar for its value. */
 export function BarChart({ bars, goalLine, unit, width, height = 140, summary }: Props) {
+  const styles = useStyles();
+  const colors = useColors();
   const [selected, setSelected] = useState<string | null>(null);
   const sel = bars.find((b) => b.key === selected);
 
@@ -89,18 +91,20 @@ export function BarChart({ bars, goalLine, unit, width, height = 140, summary }:
   );
 }
 
-const styles = StyleSheet.create({
-  readout: { fontFamily: fonts.bold, fontSize: 14, color: colors.text, marginBottom: 10 },
-  row: { flexDirection: 'row', flex: 1 },
-  goal: { position: 'absolute', right: 0, fontFamily: fonts.bold, fontSize: 10, color: colors.textSoft },
-  label: {
-    flex: 1,
-    textAlign: 'center',
-    fontFamily: fonts.bold,
-    fontSize: 10,
-    color: colors.textSoft,
-    marginTop: 6,
-    overflow: 'visible',
-  },
-  labelOn: { color: colors.red },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    readout: { fontFamily: fonts.bold, fontSize: 14, color: colors.text, marginBottom: 10 },
+    row: { flexDirection: 'row', flex: 1 },
+    goal: { position: 'absolute', right: 0, fontFamily: fonts.bold, fontSize: 10, color: colors.textSoft },
+    label: {
+      flex: 1,
+      textAlign: 'center',
+      fontFamily: fonts.bold,
+      fontSize: 10,
+      color: colors.textSoft,
+      marginTop: 6,
+      overflow: 'visible',
+    },
+    labelOn: { color: colors.red },
+  }),
+);

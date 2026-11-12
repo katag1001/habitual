@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
-import { colors, fonts } from '@/theme';
+import { fonts, makeStyles, useColors } from '@/theme';
 
 export interface Tab<T extends string> {
   key: T;
@@ -17,6 +17,8 @@ interface Props<T extends string> {
 }
 
 export function TabSwitch<T extends string>({ tabs, value, onChange, small }: Props<T>) {
+  const styles = useStyles();
+  const colors = useColors();
   const [width, setWidth] = useState(0);
   const index = tabs.findIndex((t) => t.key === value);
   const x = useSharedValue(index);
@@ -42,19 +44,21 @@ export function TabSwitch<T extends string>({ tabs, value, onChange, small }: Pr
   );
 }
 
-const styles = StyleSheet.create({
-  wrap: {
-    flexDirection: 'row',
-    borderWidth: 1.5,
-    borderColor: colors.red,
-    borderRadius: 22,
-    padding: 3,
-    height: 44,
-  },
-  wrapSmall: { height: 34, borderRadius: 17 },
-  pill: { position: 'absolute', top: 3, left: 3, bottom: 3, borderRadius: 18, backgroundColor: colors.red },
-  pillSmall: { borderRadius: 13 },
-  tab: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  label: { fontFamily: fonts.bold, fontSize: 15, color: colors.red },
-  labelSmall: { fontSize: 13 },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    wrap: {
+      flexDirection: 'row',
+      borderWidth: 1.5,
+      borderColor: colors.red,
+      borderRadius: 22,
+      padding: 3,
+      height: 44,
+    },
+    wrapSmall: { height: 34, borderRadius: 17 },
+    pill: { position: 'absolute', top: 3, left: 3, bottom: 3, borderRadius: 18, backgroundColor: colors.red },
+    pillSmall: { borderRadius: 13 },
+    tab: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+    label: { fontFamily: fonts.bold, fontSize: 15, color: colors.red },
+    labelSmall: { fontSize: 13 },
+  }),
+);

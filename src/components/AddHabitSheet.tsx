@@ -12,7 +12,7 @@ import { Sheet, SheetButtons } from './Sheet';
 import { WheelPicker } from './WheelPicker';
 import { PeriodKind, WEEKDAYS } from '@/lib/dates';
 import { Habit, Unit, describeHabit, unitLabel } from '@/lib/habits';
-import { colors, fonts } from '@/theme';
+import { fonts, makeStyles, useColors } from '@/theme';
 
 const UNITS: Unit[] = ['minutes', 'hours', 'times'];
 const PERIODS: PeriodKind[] = ['day', 'week', 'month'];
@@ -34,6 +34,8 @@ export function AddHabitSheet({ visible, onClose, onSave, initial }: Props) {
 }
 
 function AddHabitBody({ onClose, onSave, initial }: Omit<Props, 'visible'>) {
+  const styles = useStyles();
+  const colors = useColors();
   const [name, setName] = useState(initial?.name ?? '');
   const [rawAmount, setAmount] = useState(initial?.amount ?? 1);
   const [unitIdx, setUnitIdx] = useState(initial ? UNITS.indexOf(initial.unit) : 2);
@@ -112,6 +114,8 @@ function AddHabitBody({ onClose, onSave, initial }: Omit<Props, 'visible'>) {
 
 /** Borderless input: shows "habit name" with a blinking cursor; once focused only the real cursor remains. */
 function NameInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const styles = useStyles();
+  const colors = useColors();
   const ref = useRef<TextInputInstance>(null);
   const [focused, setFocused] = useState(false);
   const blink = useSharedValue(1);
@@ -147,27 +151,29 @@ function NameInput({ value, onChange }: { value: string; onChange: (v: string) =
   );
 }
 
-const styles = StyleSheet.create({
-  nameWrap: { height: 48, justifyContent: 'center', marginBottom: 12 },
-  nameInput: { fontFamily: fonts.display, fontSize: 26, color: colors.red, padding: 0 },
-  placeholder: { ...StyleSheet.absoluteFill, flexDirection: 'row', alignItems: 'center' },
-  placeholderText: { fontFamily: fonts.display, fontSize: 26, color: colors.textSoft, opacity: 0.6 },
-  fakeCursor: { width: 2, height: 28, backgroundColor: colors.red, marginLeft: 4 },
-  wheels: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
-  every: { fontFamily: fonts.bold, fontSize: 16, color: colors.textSoft, marginHorizontal: 4 },
-  daysBlock: { marginTop: 12 },
-  hint: { fontFamily: fonts.body, fontSize: 13, color: colors.textSoft, textAlign: 'center', marginBottom: 8 },
-  days: { flexDirection: 'row', justifyContent: 'space-between' },
-  day: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    borderWidth: 1.5,
-    borderColor: colors.red,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dayOn: { backgroundColor: colors.red },
-  dayText: { fontFamily: fonts.bold, fontSize: 13, color: colors.red },
-  summary: { fontFamily: fonts.bold, fontSize: 15, color: colors.text, textAlign: 'center', marginTop: 16 },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    nameWrap: { height: 48, justifyContent: 'center', marginBottom: 12 },
+    nameInput: { fontFamily: fonts.display, fontSize: 26, color: colors.red, padding: 0 },
+    placeholder: { ...StyleSheet.absoluteFill, flexDirection: 'row', alignItems: 'center' },
+    placeholderText: { fontFamily: fonts.display, fontSize: 26, color: colors.textSoft, opacity: 0.6 },
+    fakeCursor: { width: 2, height: 28, backgroundColor: colors.red, marginLeft: 4 },
+    wheels: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
+    every: { fontFamily: fonts.bold, fontSize: 16, color: colors.textSoft, marginHorizontal: 4 },
+    daysBlock: { marginTop: 12 },
+    hint: { fontFamily: fonts.body, fontSize: 13, color: colors.textSoft, textAlign: 'center', marginBottom: 8 },
+    days: { flexDirection: 'row', justifyContent: 'space-between' },
+    day: {
+      width: 38,
+      height: 38,
+      borderRadius: 19,
+      borderWidth: 1.5,
+      borderColor: colors.red,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    dayOn: { backgroundColor: colors.red },
+    dayText: { fontFamily: fonts.bold, fontSize: 13, color: colors.red },
+    summary: { fontFamily: fonts.bold, fontSize: 15, color: colors.text, textAlign: 'center', marginTop: 16 },
+  }),
+);

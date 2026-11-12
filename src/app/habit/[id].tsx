@@ -31,7 +31,7 @@ import {
   weekdayStats,
 } from '@/lib/stats';
 import { useHabits } from '@/store/HabitsContext';
-import { colors, fonts } from '@/theme';
+import { fonts, makeStyles, useColors } from '@/theme';
 
 const H_PAD = 20;
 const CARD_PAD = 16;
@@ -47,6 +47,7 @@ const RANGE_TABS: Tab<ChartRange>[] = [
 const PERIOD_WORD = { day: 'today', week: 'this week', month: 'this month' } as const;
 
 export default function HabitScreen() {
+  const styles = useStyles();
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const { habits } = useHabits();
@@ -66,6 +67,8 @@ export default function HabitScreen() {
 }
 
 function HabitDetail({ habit }: { habit: Habit }) {
+  const styles = useStyles();
+  const colors = useColors();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const { logs, updateHabit, deleteHabit } = useHabits();
@@ -273,6 +276,8 @@ function HabitDetail({ habit }: { habit: Habit }) {
 }
 
 function Tile({ big, small, strong }: { big: string; small: string; strong?: boolean }) {
+  const styles = useStyles();
+  const colors = useColors();
   return (
     <View style={[styles.tile, strong && { borderColor: colors.red }]}>
       <Text style={styles.tileBig} numberOfLines={1} adjustsFontSizeToFit>
@@ -284,6 +289,7 @@ function Tile({ big, small, strong }: { big: string; small: string; strong?: boo
 }
 
 function RecordRow({ label, value, note, last }: { label: string; value: string | null; note?: string; last?: boolean }) {
+  const styles = useStyles();
   return (
     <View style={[styles.record, !last && styles.recordBorder]}>
       <Text style={styles.recordLabel}>{label}</Text>
@@ -295,63 +301,65 @@ function RecordRow({ label, value, note, last }: { label: string; value: string 
   );
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg },
-  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: H_PAD },
-  back: { fontFamily: fonts.bold, fontSize: 16, color: colors.red },
-  menuBtn: { paddingVertical: 4 },
-  menuDots: { fontFamily: fonts.bold, fontSize: 16, color: colors.red, letterSpacing: 2 },
-  title: {
-    fontFamily: fonts.display,
-    fontSize: 36,
-    color: colors.red,
-    marginTop: 12,
-    textShadowColor: colors.redShadow,
-    textShadowOffset: { width: 3, height: 3 },
-    textShadowRadius: 1,
-  },
-  sub: { fontFamily: fonts.bold, fontSize: 16, color: colors.textSoft, marginTop: 2 },
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    screen: { flex: 1, backgroundColor: colors.bg },
+    topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: H_PAD },
+    back: { fontFamily: fonts.bold, fontSize: 16, color: colors.red },
+    menuBtn: { paddingVertical: 4 },
+    menuDots: { fontFamily: fonts.bold, fontSize: 16, color: colors.red, letterSpacing: 2 },
+    title: {
+      fontFamily: fonts.display,
+      fontSize: 36,
+      color: colors.red,
+      marginTop: 12,
+      textShadowColor: colors.redShadow,
+      textShadowOffset: { width: 3, height: 3 },
+      textShadowRadius: 1,
+    },
+    sub: { fontFamily: fonts.bold, fontSize: 16, color: colors.textSoft, marginTop: 2 },
 
-  hero: { alignItems: 'center', marginTop: 24 },
-  ringBig: { fontFamily: fonts.display, fontSize: 40, color: colors.red, lineHeight: 50 },
-  ringSmall: { fontFamily: fonts.bold, fontSize: 13, color: colors.textSoft, marginTop: -4 },
-  status: { fontFamily: fonts.bold, fontSize: 16, color: colors.text, marginTop: 14 },
-  tapHint: { fontFamily: fonts.body, fontSize: 12, color: colors.textSoft, marginTop: 2 },
+    hero: { alignItems: 'center', marginTop: 24 },
+    ringBig: { fontFamily: fonts.display, fontSize: 40, color: colors.red, lineHeight: 50 },
+    ringSmall: { fontFamily: fonts.bold, fontSize: 13, color: colors.textSoft, marginTop: -4 },
+    status: { fontFamily: fonts.bold, fontSize: 16, color: colors.text, marginTop: 14 },
+    tapHint: { fontFamily: fonts.body, fontSize: 12, color: colors.textSoft, marginTop: 2 },
 
-  tiles: { flexDirection: 'row', gap: 12, marginTop: 12 },
-  tile: {
-    flex: 1,
-    borderWidth: 1.5,
-    borderColor: colors.pink,
-    borderRadius: 16,
-    paddingVertical: 10,
-    paddingHorizontal: 8,
-    alignItems: 'center',
-  },
-  tileBig: { fontFamily: fonts.display, fontSize: 26, color: colors.red },
-  tileSmall: { fontFamily: fonts.bold, fontSize: 11, color: colors.textSoft, textTransform: 'uppercase', letterSpacing: 1 },
+    tiles: { flexDirection: 'row', gap: 12, marginTop: 12 },
+    tile: {
+      flex: 1,
+      borderWidth: 1.5,
+      borderColor: colors.pink,
+      borderRadius: 16,
+      paddingVertical: 10,
+      paddingHorizontal: 8,
+      alignItems: 'center',
+    },
+    tileBig: { fontFamily: fonts.display, fontSize: 26, color: colors.red },
+    tileSmall: { fontFamily: fonts.bold, fontSize: 11, color: colors.textSoft, textTransform: 'uppercase', letterSpacing: 1 },
 
-  empty: { fontFamily: fonts.body, fontSize: 14, color: colors.textSoft, textAlign: 'center', paddingVertical: 20 },
-  count: { fontFamily: fonts.bold, fontSize: 12, color: colors.red },
+    empty: { fontFamily: fonts.body, fontSize: 14, color: colors.textSoft, textAlign: 'center', paddingVertical: 20 },
+    count: { fontFamily: fonts.bold, fontSize: 12, color: colors.red },
 
-  record: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 10 },
-  recordBorder: { borderBottomWidth: StyleSheet.hairlineWidth, borderColor: colors.pink },
-  recordLabel: { fontFamily: fonts.bold, fontSize: 14, color: colors.text },
-  recordValue: { fontFamily: fonts.display, fontSize: 18, color: colors.red },
-  recordNote: { fontFamily: fonts.body, fontSize: 11, color: colors.textSoft },
+    record: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 10 },
+    recordBorder: { borderBottomWidth: StyleSheet.hairlineWidth, borderColor: colors.pink },
+    recordLabel: { fontFamily: fonts.bold, fontSize: 14, color: colors.text },
+    recordValue: { fontFamily: fonts.display, fontSize: 18, color: colors.red },
+    recordNote: { fontFamily: fonts.body, fontSize: 11, color: colors.textSoft },
 
-  menuTitle: { fontFamily: fonts.display, fontSize: 24, color: colors.red, marginBottom: 16 },
-  menuItem: {
-    height: 48,
-    borderRadius: 24,
-    borderWidth: 1.5,
-    borderColor: colors.red,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 10,
-  },
-  menuSolid: { backgroundColor: colors.red },
-  menuText: { fontFamily: fonts.bold, fontSize: 16, color: colors.red },
-  deleteBtn: { alignSelf: 'center', padding: 10, marginTop: 4 },
-  deleteText: { fontFamily: fonts.bold, fontSize: 15, color: colors.red, textDecorationLine: 'underline' },
-});
+    menuTitle: { fontFamily: fonts.display, fontSize: 24, color: colors.red, marginBottom: 16 },
+    menuItem: {
+      height: 48,
+      borderRadius: 24,
+      borderWidth: 1.5,
+      borderColor: colors.red,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 10,
+    },
+    menuSolid: { backgroundColor: colors.red },
+    menuText: { fontFamily: fonts.bold, fontSize: 16, color: colors.red },
+    deleteBtn: { alignSelf: 'center', padding: 10, marginTop: 4 },
+    deleteText: { fontFamily: fonts.bold, fontSize: 15, color: colors.red, textDecorationLine: 'underline' },
+  }),
+);

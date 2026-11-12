@@ -7,7 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
 import { HabitsProvider, useHabits } from '@/store/HabitsContext';
-import { colors } from '@/theme';
+import { ThemeProvider, useColors } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -16,14 +16,17 @@ export default function RootLayout() {
 
   if (!fontsLoaded && !fontError) return null;
   return (
-    <HabitsProvider>
-      <AppStack />
-    </HabitsProvider>
+    <ThemeProvider>
+      <HabitsProvider>
+        <AppStack />
+      </HabitsProvider>
+    </ThemeProvider>
   );
 }
 
 function AppStack() {
   const { ready } = useHabits();
+  const colors = useColors();
 
   useEffect(() => {
     if (ready) SplashScreen.hideAsync();

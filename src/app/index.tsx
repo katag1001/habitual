@@ -9,10 +9,11 @@ import { DailyList } from '@/components/DailyList';
 import { HabitGrid } from '@/components/HabitGrid';
 import { LogAmountSheet, LogTarget } from '@/components/LogAmountSheet';
 import { Tab, TabSwitch } from '@/components/TabSwitch';
+import { ThemeSheet } from '@/components/ThemeSheet';
 import { PeriodKind, periodKey, periodLabel, shiftPeriod, today } from '@/lib/dates';
 import { Habit, periodPercent, streak } from '@/lib/habits';
 import { useHabits } from '@/store/HabitsContext';
-import { colors, fonts } from '@/theme';
+import { fonts, makeStyles } from '@/theme';
 
 const STREAK_UNIT: Record<PeriodKind, [string, string]> = {
   day: ['day', 'days'],
@@ -27,6 +28,7 @@ const PERIOD_TABS: Tab<PeriodKind>[] = [
 ];
 
 export default function Home() {
+  const styles = useStyles();
   const insets = useSafeAreaInsets();
   const { habits: allHabits, logs, addHabit } = useHabits();
   const habits = useMemo(() => allHabits.filter((h) => !h.archived), [allHabits]);
@@ -35,6 +37,7 @@ export default function Home() {
   const [kind, setKind] = useState<PeriodKind>('week');
   const [anchor, setAnchor] = useState(today);
   const [adding, setAdding] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [logTarget, setLogTarget] = useState<LogTarget | null>(null);
   const [burst, setBurst] = useState<ConfettiBurst | null>(null);
 
@@ -51,9 +54,14 @@ export default function Home() {
     <View style={[styles.screen, { paddingTop: insets.top + 8 }]}>
       <View style={styles.header}>
         <Text style={styles.title}>You got this </Text>
-        <Pressable style={styles.plus} onPress={() => setAdding(true)} hitSlop={8} accessibilityLabel="Add habit">
-          <Text style={styles.plusText}>+</Text>
-        </Pressable>
+        <View style={styles.actions}>
+          <Pressable onPress={() => setMenuOpen(true)} hitSlop={10} style={styles.menuBtn} accessibilityLabel="More options">
+            <Text style={styles.menuDots}>•••</Text>
+          </Pressable>
+          <Pressable style={styles.plus} onPress={() => setAdding(true)} hitSlop={8} accessibilityLabel="Add habit">
+            <Text style={styles.plusText}>+</Text>
+          </Pressable>
+        </View>
       </View>
 
       <View style={styles.stats}>
@@ -115,6 +123,7 @@ export default function Home() {
         )}
       </ScrollView>
 
+      <ThemeSheet visible={menuOpen} onClose={() => setMenuOpen(false)} />
       <AddHabitSheet visible={adding} onClose={() => setAdding(false)} onSave={addHabit} />
       <LogAmountSheet target={logTarget} onClose={() => setLogTarget(null)} onCelebrate={() => setBurst(createBurst())} />
       <Confetti burst={burst} />
@@ -122,45 +131,50 @@ export default function Home() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20 },
-  title: {
-    fontFamily: fonts.display,
-    fontSize: 40,
-    color: colors.red,
-    textShadowColor: colors.redShadow,
-    textShadowOffset: { width: 3, height: 3 },
-    textShadowRadius: 1,
-  },
-  plus: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: colors.red,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  plusText: { color: colors.card, fontSize: 28, lineHeight: 32, fontFamily: fonts.bold },
-  stats: { flexDirection: 'row', gap: 12, paddingHorizontal: 20, marginTop: 12 },
-  statBox: {
-    flex: 1,
-    borderWidth: 1.5,
-    borderColor: colors.red,
-    borderRadius: 16,
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  streakBox: { borderColor: colors.pink },
-  statBig: { fontFamily: fonts.display, fontSize: 26, color: colors.red },
-  statSmall: { fontFamily: fonts.bold, fontSize: 12, color: colors.textSoft, textTransform: 'uppercase', letterSpacing: 1 },
-  tabs: { paddingHorizontal: 20, marginTop: 16 },
-  nav: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, marginVertical: 12 },
-  arrow: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-  arrowText: { fontFamily: fonts.bold, fontSize: 30, color: colors.red, lineHeight: 34 },
-  navLabel: { fontFamily: fonts.bold, fontSize: 16, color: colors.text },
-  empty: { fontFamily: fonts.body, fontSize: 16, color: colors.textSoft, textAlign: 'center', marginTop: 60 },
-  archived: { alignItems: 'center', gap: 10, marginTop: 32 },
-  archivedToggle: { fontFamily: fonts.bold, fontSize: 13, color: colors.textSoft, textDecorationLine: 'underline' },
-  archivedName: { fontFamily: fonts.bold, fontSize: 15, color: colors.textSoft },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    screen: { flex: 1, backgroundColor: colors.bg },
+    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20 },
+    title: {
+      fontFamily: fonts.display,
+      fontSize: 40,
+      color: colors.red,
+      textShadowColor: colors.redShadow,
+      textShadowOffset: { width: 3, height: 3 },
+      textShadowRadius: 1,
+    },
+    actions: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    menuBtn: { height: 44, paddingHorizontal: 6, justifyContent: 'center' },
+    menuDots: { fontFamily: fonts.bold, fontSize: 16, color: colors.red, letterSpacing: 2 },
+    plus: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: colors.red,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    plusText: { color: colors.card, fontSize: 28, lineHeight: 32, fontFamily: fonts.bold },
+    stats: { flexDirection: 'row', gap: 12, paddingHorizontal: 20, marginTop: 12 },
+    statBox: {
+      flex: 1,
+      borderWidth: 1.5,
+      borderColor: colors.red,
+      borderRadius: 16,
+      paddingVertical: 10,
+      alignItems: 'center',
+    },
+    streakBox: { borderColor: colors.pink },
+    statBig: { fontFamily: fonts.display, fontSize: 26, color: colors.red },
+    statSmall: { fontFamily: fonts.bold, fontSize: 12, color: colors.textSoft, textTransform: 'uppercase', letterSpacing: 1 },
+    tabs: { paddingHorizontal: 20, marginTop: 16 },
+    nav: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, marginVertical: 12 },
+    arrow: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
+    arrowText: { fontFamily: fonts.bold, fontSize: 30, color: colors.red, lineHeight: 34 },
+    navLabel: { fontFamily: fonts.bold, fontSize: 16, color: colors.text },
+    empty: { fontFamily: fonts.body, fontSize: 16, color: colors.textSoft, textAlign: 'center', marginTop: 60 },
+    archived: { alignItems: 'center', gap: 10, marginTop: 32 },
+    archivedToggle: { fontFamily: fonts.bold, fontSize: 13, color: colors.textSoft, textDecorationLine: 'underline' },
+    archivedName: { fontFamily: fonts.bold, fontSize: 15, color: colors.textSoft },
+  }),
+);

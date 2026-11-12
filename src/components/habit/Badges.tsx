@@ -1,10 +1,12 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Badge } from '@/lib/stats';
-import { colors, fonts } from '@/theme';
+import { fonts, makeStyles, useColors } from '@/theme';
 
 /** Grid of milestone circles: solid red when earned, faint outline when not. */
 export function Badges({ items, width }: { items: Badge[]; width: number }) {
+  const styles = useStyles();
+  const colors = useColors();
   const perRow = 4;
   const gap = 10;
   const size = Math.min(64, (width - gap * (perRow - 1)) / perRow);
@@ -37,11 +39,13 @@ export function Badges({ items, width }: { items: Badge[]; width: number }) {
   );
 }
 
-const styles = StyleSheet.create({
-  grid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: 14 },
-  circle: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
-  earned: { backgroundColor: colors.red },
-  locked: { borderWidth: 1.5, borderColor: colors.pink, borderStyle: 'dashed' },
-  value: { fontFamily: fonts.display, fontSize: 18 },
-  caption: { fontFamily: fonts.bold, fontSize: 10, color: colors.textSoft, marginTop: 4 },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    grid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: 14 },
+    circle: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
+    earned: { backgroundColor: colors.red },
+    locked: { borderWidth: 1.5, borderColor: colors.pink, borderStyle: 'dashed' },
+    value: { fontFamily: fonts.display, fontSize: 18 },
+    caption: { fontFamily: fonts.bold, fontSize: 10, color: colors.textSoft, marginTop: 4 },
+  }),
+);

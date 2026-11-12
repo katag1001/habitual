@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Dot } from '../Dot';
 import { WEEKDAYS, dateKey, daysBetween, parseKey, periodLabel, periodRange, shiftPeriod, today, weekdayIndex } from '@/lib/dates';
 import { Habit, Logs, cellState } from '@/lib/habits';
-import { colors, fonts } from '@/theme';
+import { fonts, makeStyles } from '@/theme';
 
 interface Props {
   habit: Habit;
@@ -15,6 +15,7 @@ interface Props {
 
 /** Month of dots, one per day; tap a past day to log it. */
 export function MonthCalendar({ habit, logs, width, onPressDay }: Props) {
+  const styles = useStyles();
   const now = today();
   const [anchor, setAnchor] = useState(() => periodRange('month', now).start);
   const { start, end } = periodRange('month', anchor);
@@ -66,15 +67,17 @@ export function MonthCalendar({ habit, logs, width, onPressDay }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  nav: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
-  arrow: { fontFamily: fonts.bold, fontSize: 26, color: colors.red, lineHeight: 30, paddingHorizontal: 6 },
-  faded: { opacity: 0.25 },
-  month: { fontFamily: fonts.bold, fontSize: 15, color: colors.text },
-  row: { flexDirection: 'row' },
-  weekday: { fontFamily: fonts.bold, fontSize: 11, color: colors.red, textAlign: 'center', marginBottom: 6 },
-  grid: { flexDirection: 'row', flexWrap: 'wrap' },
-  cell: { alignItems: 'center', justifyContent: 'center' },
-  num: { fontFamily: fonts.body, fontSize: 10, color: colors.textSoft, marginTop: 2 },
-  numToday: { fontFamily: fonts.bold, color: colors.red },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    nav: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
+    arrow: { fontFamily: fonts.bold, fontSize: 26, color: colors.red, lineHeight: 30, paddingHorizontal: 6 },
+    faded: { opacity: 0.25 },
+    month: { fontFamily: fonts.bold, fontSize: 15, color: colors.text },
+    row: { flexDirection: 'row' },
+    weekday: { fontFamily: fonts.bold, fontSize: 11, color: colors.red, textAlign: 'center', marginBottom: 6 },
+    grid: { flexDirection: 'row', flexWrap: 'wrap' },
+    cell: { alignItems: 'center', justifyContent: 'center' },
+    num: { fontFamily: fonts.body, fontSize: 10, color: colors.textSoft, marginTop: 2 },
+    numToday: { fontFamily: fonts.bold, color: colors.red },
+  }),
+);

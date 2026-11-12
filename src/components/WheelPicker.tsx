@@ -11,7 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
-import { colors, fonts } from '@/theme';
+import { fonts, makeStyles } from '@/theme';
 
 const ITEM_H = 40;
 const VISIBLE = 5; // must be odd
@@ -26,6 +26,7 @@ interface Props {
 
 /** A drum-style picker: items roll away and fade out towards the top and bottom. */
 export function WheelPicker({ items, index, onChange, width = 90 }: Props) {
+  const styles = useStyles();
   const listRef = useRef<Animated.FlatList<string>>(null);
   const scrollY = useSharedValue(index * ITEM_H);
   const reported = useRef(index);
@@ -88,6 +89,7 @@ export function WheelPicker({ items, index, onChange, width = 90 }: Props) {
 }
 
 function WheelItem({ label, position, scrollY }: { label: string; position: number; scrollY: SharedValue<number> }) {
+  const styles = useStyles();
   const style = useAnimatedStyle(() => {
     const d = (scrollY.value - position * ITEM_H) / ITEM_H; // >0 above centre, <0 below
     const abs = Math.abs(d);
@@ -110,17 +112,19 @@ function WheelItem({ label, position, scrollY }: { label: string; position: numb
   );
 }
 
-const styles = StyleSheet.create({
-  band: {
-    position: 'absolute',
-    left: 4,
-    right: 4,
-    top: ITEM_H * PAD,
-    height: ITEM_H,
-    borderTopWidth: 1.5,
-    borderBottomWidth: 1.5,
-    borderColor: colors.red,
-  },
-  item: { height: ITEM_H, alignItems: 'center', justifyContent: 'center' },
-  label: { fontFamily: fonts.bold, fontSize: 20, color: colors.red },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    band: {
+      position: 'absolute',
+      left: 4,
+      right: 4,
+      top: ITEM_H * PAD,
+      height: ITEM_H,
+      borderTopWidth: 1.5,
+      borderBottomWidth: 1.5,
+      borderColor: colors.red,
+    },
+    item: { height: ITEM_H, alignItems: 'center', justifyContent: 'center' },
+    label: { fontFamily: fonts.bold, fontSize: 20, color: colors.red },
+  }),
+);

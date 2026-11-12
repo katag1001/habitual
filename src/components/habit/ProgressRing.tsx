@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedProps, useSharedValue, withTiming } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
 
-import { colors } from '@/theme';
+import { useColors } from '@/theme';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -15,6 +15,7 @@ interface Props {
 }
 
 export function ProgressRing({ size, stroke, progress, children }: Props) {
+  const colors = useColors();
   const r = (size - stroke) / 2;
   const circumference = 2 * Math.PI * r;
   const level = useSharedValue(0);

@@ -2,9 +2,11 @@ import { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
-import { colors } from '@/theme';
+import { makeStyles, useColors } from '@/theme';
 
 export function ProgressBar({ progress, planned }: { progress: number; planned: boolean }) {
+  const styles = useStyles();
+  const colors = useColors();
   const level = useSharedValue(progress);
 
   useEffect(() => {
@@ -20,7 +22,9 @@ export function ProgressBar({ progress, planned }: { progress: number; planned: 
   );
 }
 
-const styles = StyleSheet.create({
-  track: { height: 18, borderRadius: 9, borderWidth: 1.5, overflow: 'hidden' },
-  fill: { height: '100%', backgroundColor: colors.red, borderRadius: 9 },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    track: { height: 18, borderRadius: 9, borderWidth: 1.5, overflow: 'hidden' },
+    fill: { height: '100%', backgroundColor: colors.red, borderRadius: 9 },
+  }),
+);

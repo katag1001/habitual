@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { ProgressBar } from './ProgressBar';
 import { today } from '@/lib/dates';
 import { Habit, Logs, isDueOn, isPerDay, ownPeriodProgress, roundAmount, unitLabel } from '@/lib/habits';
-import { colors, fonts } from '@/theme';
+import { fonts, makeStyles } from '@/theme';
 
 interface Props {
   date: Date;
@@ -14,6 +14,7 @@ interface Props {
 }
 
 export function DailyList({ date, habits, logs, onPressHabit }: Props) {
+  const styles = useStyles();
   const future = date > today();
 
   return (
@@ -46,10 +47,21 @@ export function DailyList({ date, habits, logs, onPressHabit }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  list: { paddingHorizontal: 20, gap: 18, paddingTop: 4 },
-  row: { gap: 8 },
-  top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 12 },
-  name: { fontFamily: fonts.bold, fontSize: 16, color: colors.text, textDecorationLine: 'underline', textDecorationColor: colors.pink },
-  label: { fontFamily: fonts.body, fontSize: 13, color: colors.textSoft },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    list: { paddingHorizontal: 20, gap: 18, paddingTop: 4 },
+    row: { gap: 8 },
+    top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 12 },
+    // A bottom border instead of textDecoration, so the line can sit lower and be thicker.
+    name: {
+      alignSelf: 'flex-start',
+      fontFamily: fonts.bold,
+      fontSize: 16,
+      color: colors.text,
+      paddingBottom: 4,
+      borderBottomWidth: 2,
+      borderColor: colors.red,
+    },
+    label: { fontFamily: fonts.body, fontSize: 13, color: colors.textSoft },
+  }),
+);

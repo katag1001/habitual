@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { WEEKDAYS } from '@/lib/dates';
 import { Unit } from '@/lib/habits';
 import { WeekdayStat, formatAmount } from '@/lib/stats';
-import { colors, fonts } from '@/theme';
+import { fonts, makeStyles, useColors } from '@/theme';
 
 const TRACK_H = 90;
 
@@ -15,6 +15,8 @@ interface Props {
 
 /** Seven columns, Mon–Sun; the strongest day is solid red. */
 export function WeekdayChart({ mode, days, unit }: Props) {
+  const styles = useStyles();
+  const colors = useColors();
   const max = mode === 'rate' ? 1 : Math.max(...days.map((d) => d.value), 0);
   const bestValue = Math.max(...days.filter((d) => !d.off).map((d) => d.value), 0);
 
@@ -44,19 +46,21 @@ export function WeekdayChart({ mode, days, unit }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  row: { flexDirection: 'row', gap: 6 },
-  col: { flex: 1, alignItems: 'center' },
-  value: { fontFamily: fonts.bold, fontSize: 10, color: colors.textSoft, marginBottom: 4 },
-  track: {
-    width: '100%',
-    maxWidth: 30,
-    height: TRACK_H,
-    borderRadius: 10,
-    backgroundColor: colors.pinkFaint,
-    overflow: 'hidden',
-    justifyContent: 'flex-end',
-  },
-  fill: { width: '100%', borderRadius: 10 },
-  day: { fontFamily: fonts.bold, fontSize: 11, color: colors.textSoft, marginTop: 6, textTransform: 'uppercase' },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    row: { flexDirection: 'row', gap: 6 },
+    col: { flex: 1, alignItems: 'center' },
+    value: { fontFamily: fonts.bold, fontSize: 10, color: colors.textSoft, marginBottom: 4 },
+    track: {
+      width: '100%',
+      maxWidth: 30,
+      height: TRACK_H,
+      borderRadius: 10,
+      backgroundColor: colors.pinkFaint,
+      overflow: 'hidden',
+      justifyContent: 'flex-end',
+    },
+    fill: { width: '100%', borderRadius: 10 },
+    day: { fontFamily: fonts.bold, fontSize: 11, color: colors.textSoft, marginTop: 6, textTransform: 'uppercase' },
+  }),
+);
