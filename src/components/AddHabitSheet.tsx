@@ -37,19 +37,32 @@ function AddHabitBody({ onClose, onSave, initial }: Omit<Props, 'visible'>) {
   const [name, setName] = useState(initial?.name ?? '');
   const [rawAmount, setAmount] = useState(initial?.amount ?? 1);
   const [unitIdx, setUnitIdx] = useState(initial ? UNITS.indexOf(initial.unit) : 2);
-  const [periodIdx, setPeriodIdx] = useState(initial ? PERIODS.indexOf(initial.period) : 0);
+  // A habit on chosen weekdays is a per-day goal, so it shows as "every day" with those days ticked.
+  const [periodIdx, setPeriodIdx] = useState(() => {
+    if (!initial) return 0;
+    if (initial.period === 'week' && initial.days?.length) return 0;
+    return PERIODS.indexOf(initial.period);
+  });
   const [days, setDays] = useState<number[]>(initial?.days ?? []);
 
   const unit = UNITS[unitIdx];
   const period = PERIODS[periodIdx];
-  const perDay = period === 'day' || (period === 'week' && days.length > 0);
+  const daysAllowed = period !== 'month';
+  const chosenDays = daysAllowed && days.length ? days : undefined;
+  const perDay = period === 'day' || !!chosenDays;
   // Block combinations that don't make sense, like 30 hours a day.
   const maxAmount = unit === 'hours' && perDay ? 24 : 60;
   const amount = Math.min(rawAmount, maxAmount);
 
   const numbers = Array.from({ length: maxAmount }, (_, i) => String(i + 1));
   const units = UNITS.map((u) => unitLabel(u, amount));
-  const habit = { amount, unit, period, days: period === 'week' && days.length ? days : undefined };
+  // Chosen days are stored as a weekly habit with `days` (the amount applies to each chosen day).
+  const habit = { amount, unit, period: chosenDays ? ('week' as const) : period, days: chosenDays };
+  const daysHint = !daysAllowed
+    ? 'specific days aren’t available for monthly goals'
+    : period === 'day'
+      ? 'only on certain days? optional — every day if none are picked'
+      : 'on certain days? optional — any day of the week if none are picked';
 
   const toggleDay = (i: number) =>
     setDays((prev) => (prev.includes(i) ? prev.filter((d) => d !== i) : [...prev, i].sort()));
@@ -70,21 +83,25 @@ function AddHabitBody({ onClose, onSave, initial }: Omit<Props, 'visible'>) {
         <WheelPicker items={PERIODS} index={periodIdx} onChange={setPeriodIdx} width={84} />
       </View>
 
-      {period === 'week' && (
-        <View style={styles.daysBlock}>
-          <Text style={styles.hint}>on certain days? (optional)</Text>
-          <View style={styles.days}>
-            {WEEKDAYS.map((d, i) => {
-              const on = days.includes(i);
-              return (
-                <Pressable key={d} onPress={() => toggleDay(i)} style={[styles.day, on && styles.dayOn]} hitSlop={4}>
-                  <Text style={[styles.dayText, on && { color: colors.card }]}>{d.slice(0, 2)}</Text>
-                </Pressable>
-              );
-            })}
-          </View>
+      <View style={styles.daysBlock}>
+        <Text style={styles.hint}>{daysHint}</Text>
+        <View style={[styles.days, !daysAllowed && { opacity: 0.35 }]}>
+          {WEEKDAYS.map((d, i) => {
+            const on = daysAllowed && days.includes(i);
+            return (
+              <Pressable
+                key={d}
+                onPress={() => toggleDay(i)}
+                disabled={!daysAllowed}
+                style={[styles.day, on && styles.dayOn]}
+                hitSlop={4}
+              >
+                <Text style={[styles.dayText, on && { color: colors.card }]}>{d.slice(0, 2)}</Text>
+              </Pressable>
+            );
+          })}
         </View>
-      )}
+      </View>
 
       <Text style={styles.summary}>{describeHabit(habit)}</Text>
 

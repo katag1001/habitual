@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import { PeriodKind, dateKey, periodKey, today } from '@/lib/dates';
-import { Habit, Logs, periodPercent } from '@/lib/habits';
+import { Habit, Logs, convertLogs, periodPercent } from '@/lib/habits';
 
 const KEYS = {
   habits: 'habitual:habits',
@@ -61,9 +61,20 @@ export function HabitsProvider({ children }: { children: ReactNode }) {
     setHabits((prev) => [...prev, { ...h, id, createdAt: dateKey(today()) }]);
   }, []);
 
-  const updateHabit = useCallback((id: string, changes: Partial<Omit<Habit, 'id' | 'createdAt'>>) => {
-    setHabits((prev) => prev.map((h) => (h.id === id ? { ...h, ...changes } : h)));
-  }, []);
+  const updateHabit = useCallback(
+    (id: string, changes: Partial<Omit<Habit, 'id' | 'createdAt'>>) => {
+      const old = habits.find((h) => h.id === id);
+      if (!old) return;
+      const next = { ...old, ...changes };
+      setHabits((prev) => prev.map((h) => (h.id === id ? next : h)));
+      if (next.unit !== old.unit) {
+        setLogs((prev) =>
+          prev[id] ? { ...prev, [id]: convertLogs(prev[id], old.unit, next.unit, next.amount) } : prev,
+        );
+      }
+    },
+    [habits],
+  );
 
   const deleteHabit = useCallback((id: string) => {
     setHabits((prev) => prev.filter((h) => h.id !== id));

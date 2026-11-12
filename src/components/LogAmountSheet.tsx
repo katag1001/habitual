@@ -37,7 +37,8 @@ export function LogAmountSheet({ target, onClose, onCelebrate }: Props) {
 
 function LogBody({ habit, date, onClose, onCelebrate }: LogTarget & Omit<Props, 'target'>) {
   const { logs, setLog } = useHabits();
-  const [value, setValue] = useState(() => logDefault(habit, logs, date));
+  // The wheel only has whole numbers; converted logs (e.g. 1.5 hours) round to the nearest.
+  const [value, setValue] = useState(() => Math.round(logDefault(habit, logs, date)));
   const items = Array.from({ length: logMax(habit) + 1 }, (_, i) => String(i));
 
   const save = () => {

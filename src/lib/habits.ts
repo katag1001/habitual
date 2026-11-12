@@ -182,6 +182,30 @@ export function logMax(h: Habit): number {
   return Math.max(20, h.amount);
 }
 
+/** Rounds for display; logs can hold fractions after a minutes → hours switch. */
+export function roundAmount(n: number): number {
+  return Math.round(n * 10) / 10;
+}
+
+/**
+ * Rewrites one habit's logs when its unit changes:
+ * minutes ↔ hours converts exactly, anything → times counts each logged day as one time,
+ * and times → minutes/hours treats each time as the full (new) goal amount.
+ */
+export function convertLogs(dayLogs: Record<string, number>, from: Unit, to: Unit, newAmount: number): Record<string, number> {
+  if (from === to) return dayLogs;
+  const convert = (v: number): number => {
+    if (to === 'times') return 1;
+    if (from === 'times') return v * newAmount;
+    return from === 'minutes' ? Math.round((v / 60) * 100) / 100 : v * 60;
+  };
+  const out: Record<string, number> = {};
+  for (const [key, v] of Object.entries(dayLogs)) {
+    if (v > 0) out[key] = convert(v);
+  }
+  return out;
+}
+
 /** Starting value for the log popup: what's already logged that day, otherwise the goal amount. */
 export function logDefault(h: Habit, logs: Logs, d: Date): number {
   const existing = valueOn(logs, h.id, d);

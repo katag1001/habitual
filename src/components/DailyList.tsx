@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { ProgressBar } from './ProgressBar';
 import { today } from '@/lib/dates';
-import { Habit, Logs, isDueOn, isPerDay, ownPeriodProgress, unitLabel } from '@/lib/habits';
+import { Habit, Logs, isDueOn, isPerDay, ownPeriodProgress, roundAmount, unitLabel } from '@/lib/habits';
 import { colors, fonts } from '@/theme';
 
 interface Props {
@@ -22,7 +22,7 @@ export function DailyList({ date, habits, logs, onPressHabit }: Props) {
         const { done, target } = ownPeriodProgress(h, logs, date);
         const perDay = isPerDay(h);
         const due = perDay ? isDueOn(h, date) : done < target;
-        let label = `${done} / ${target} ${unitLabel(h.unit, target, true)}`;
+        let label = `${roundAmount(done)} / ${target} ${unitLabel(h.unit, target, true)}`;
         if (!perDay) label += ` this ${h.period}`;
         else if (!isDueOn(h, date) && !done) label = 'not today';
 

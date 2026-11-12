@@ -15,7 +15,7 @@ import { LogAmountSheet, LogTarget } from '@/components/LogAmountSheet';
 import { Sheet } from '@/components/Sheet';
 import { Tab, TabSwitch } from '@/components/TabSwitch';
 import { WEEKDAYS, today } from '@/lib/dates';
-import { Habit, describeHabit, isDueOn, isPerDay, ownPeriodProgress, unitLabel } from '@/lib/habits';
+import { Habit, describeHabit, isDueOn, isPerDay, ownPeriodProgress, roundAmount, unitLabel } from '@/lib/habits';
 import {
   ChartRange,
   KIND_NOUN,
@@ -104,7 +104,10 @@ function HabitDetail({ habit }: { habit: Habit }) {
   let status: string;
   if (restDay) status = done ? 'bonus round — not scheduled today' : 'rest day — not scheduled today';
   else if (done >= target) status = `done ${periodWord}!`;
-  else status = `${target - done} ${unitLabel(habit.unit, target - done)} to go ${periodWord}`;
+  else {
+    const left = roundAmount(target - done);
+    status = `${left} ${unitLabel(habit.unit, left)} to go ${periodWord}`;
+  }
 
   // ── Captions ──
   const chartTotal = chart.bars.reduce((s, b) => s + b.value, 0);
@@ -177,7 +180,7 @@ function HabitDetail({ habit }: { habit: Habit }) {
         {/* Hero ring */}
         <Pressable style={styles.hero} onPress={() => openLog(now)}>
           <ProgressRing size={170} stroke={14} progress={target ? done / target : 0}>
-            <Text style={styles.ringBig}>{done}</Text>
+            <Text style={styles.ringBig}>{roundAmount(done)}</Text>
             <Text style={styles.ringSmall}>
               of {target} {unitLabel(habit.unit, target, true)}
             </Text>
